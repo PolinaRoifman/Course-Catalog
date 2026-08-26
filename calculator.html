@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Requirement Calculator</title>
+<script>
+  if (localStorage.getItem("theme") === "dark") {
+    document.documentElement.setAttribute("data-theme", "dark");
+  }
+</script>
+<style>
+  :root {
+    --ink: #1c1b19;
+    --paper: #eee9df;
+    --card: #f8f6f0;
+    --rule: #c9c2b2;
+    --accent: #2f4d3a;
+  }
+
+  [data-theme="dark"] {
+    --ink: #eee9df;
+    --paper: #17160f;
+    --card: #211f18;
+    --rule: #4a4638;
+    --accent: #8fbf9c;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Georgia", "Iowan Old Style", serif;
+    line-height: 1.4;
+  }
+
+  header {
+    padding: 2.5rem 1.5rem 1.5rem;
+    border-bottom: 2px solid var(--ink);
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .topnav {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-family: "Courier New", monospace;
+    align-items: center;
+  }
+
+  .topnav a {
+    color: var(--accent);
+    text-decoration: none;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+  }
+
+  .topnav a.current {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+
+  .theme-toggle {
+    margin-left: auto;
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  header h1 { margin: 0; font-size: 2rem; font-weight: 400; }
+  header p.sub { margin: 0.5rem 0 0; color: #555; font-size: 0.95rem; }
+
+  main { max-width: 1000px; margin: 0 auto; padding: 1.5rem; }
+
+  h3 {
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    margin: 1.6rem 0 0.6rem;
+  }
+
+  .program-select {
+    display: flex;
+    gap: 1rem;
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .program-select select {
+    font-family: inherit;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--rule);
+    background: var(--card);
+    color: var(--ink);
+    border-radius: 3px;
+  }
+
+  .checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .check-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.7rem;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--card);
+    font-size: 0.85rem;
+  }
+
+  .check-title { flex: 1; }
+
+  .check-toggle {
+    font-family: "Courier New", monospace;
+    font-size: 0.72rem;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 3px;
+    cursor: pointer;
+    white-space: nowrap;
+    margin-left: 0.6rem;
+  }
+
+  .check-toggle.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  .no-sections {
+    font-family: "Courier New", monospace;
+    font-size: 0.72rem;
+    color: #999;
+    padding: 0.3rem 0;
+  }
+
+  .progress-line {
+    font-family: "Courier New", monospace;
+    font-size: 0.78rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+  }
+
+  .result-banner {
+    display: block;
+    width: 100%;
+    padding: 1.4rem;
+    text-align: center;
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+    font-size: 1.05rem;
+    border-radius: 6px;
+    background: #c94f4f;
+    color: white;
+    margin: 1.5rem 0;
+    line-height: 1.8;
+  }
+
+  .result-banner.all-clear {
+    background: #3f8f5a;
+  }
+
+  @media (max-width: 640px) {
+    header, main { padding: 1.2rem 1rem; }
+    header h1 { font-size: 1.5rem; }
+    .topnav { flex-wrap: wrap; }
+    .program-select { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="topnav">
+    <a href="index.html">Catalog</a>
+    <a href="timetable.html">Timetable Builder</a>
+    <a href="calculator.html" class="current">Calculator</a>
+    <button id="themeToggle" class="theme-toggle" type="button">🌙</button>
+  </nav>
+  <h1>Requirement Calculator</h1>
+  <p class="sub">Track what you've passed and see what's still needed for your degree.</p>
+</header>
+
+<main>
+  <h3>Your Program</h3>
+  <div class="program-select">
+    <label>Year
+      <select id="yearSelect">
+        <option value="">—</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+    </label>
+    <label>Starting English level
+      <select id="englishStartSelect">
+        <option value="">—</option>
+        <option value="100">100 (Beginner)</option>
+        <option value="200">200 (Intermediate)</option>
+        <option value="300">300 (Advanced)</option>
+      </select>
+    </label>
+  </div>
+
+  <div id="wizard" style="display:none;">
+    <h3>English</h3>
+    <p class="progress-line" id="englishProgress"></p>
+    <div class="checklist" id="englishList"></div>
+
+    <h3>Economics (non-mandatory)</h3>
+    <p class="progress-line" id="economicsProgress"></p>
+    <div class="checklist" id="economicsList"></div>
+
+    <h3>Philosophy</h3>
+    <p class="progress-line" id="philosophyProgress"></p>
+    <div class="checklist" id="philosophyList"></div>
+
+    <h3>Humanities</h3>
+    <p class="progress-line" id="humanitiesProgress"></p>
+    <div class="checklist" id="humanitiesList"></div>
+
+    <h3>Social</h3>
+    <div class="checklist" id="socialList"></div>
+
+    <h3>Science &amp; Math</h3>
+    <div class="checklist" id="scienceMathList"></div>
+
+    <div id="resultsArea"></div>
+  </div>
+
+  <p class="no-sections" id="promptMessage">Pick your year and starting English level above to begin.</p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="calculator.js"></script>
+
+</body>
+</html>

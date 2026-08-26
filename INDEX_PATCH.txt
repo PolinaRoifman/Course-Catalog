@@ -1,0 +1,21 @@
+
+1. Add this navigation inside <header> in index.html:
+
+<nav class="topnav">
+  <a href="index.html">Catalog</a>
+  <a href="timetable.html">Timetable Builder</a>
+</nav>
+
+2. Add this CSS:
+
+.topnav{
+    display:flex;
+    gap:1rem;
+    margin-bottom:1rem;
+    font-family:"Courier New", monospace;
+}
+
+.topnav a{
+    color:var(--accent);
+    text-decoration:none;
+}

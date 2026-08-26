@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timetable Builder</title>
+<script>
+  if (localStorage.getItem("theme") === "dark") {
+    document.documentElement.setAttribute("data-theme", "dark");
+  }
+</script>
+<style>
+  :root {
+    --ink: #1c1b19;
+    --paper: #eee9df;
+    --card: #f8f6f0;
+    --rule: #c9c2b2;
+    --accent: #2f4d3a;
+    --conflict: #f6c8c4;
+  }
+
+  [data-theme="dark"] {
+    --ink: #eee9df;
+    --paper: #17160f;
+    --card: #211f18;
+    --rule: #4a4638;
+    --accent: #8fbf9c;
+    --conflict: #7a3a36;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Georgia", "Iowan Old Style", serif;
+    line-height: 1.4;
+  }
+
+  header {
+    padding: 2.5rem 1.5rem 1.5rem;
+    border-bottom: 2px solid var(--ink);
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .topnav {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-family: "Courier New", monospace;
+  }
+
+  .topnav a {
+    color: var(--accent);
+    text-decoration: none;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+  }
+
+  .topnav a.current {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+
+  .theme-toggle {
+    margin-left: auto;
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  .grid-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  @media (max-width: 640px) {
+    header, main { padding: 1.2rem 1rem; }
+    header h1 { font-size: 1.5rem; }
+    .topnav { flex-wrap: wrap; }
+    .week-grid-outer { min-width: 620px; }
+    .program-select { flex-wrap: wrap; }
+  }
+
+  header h1 { margin: 0; font-size: 2rem; font-weight: 400; }
+  header p.sub { margin: 0.5rem 0 0; color: #555; font-size: 0.95rem; }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+
+  h3 {
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    margin: 1.6rem 0 0.6rem;
+  }
+
+  .program-select {
+    display: flex;
+    gap: 1rem;
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+    align-items: center;
+  }
+
+  .program-select select {
+    font-family: inherit;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--rule);
+    background: var(--card);
+    color: var(--ink);
+    border-radius: 3px;
+  }
+
+  /* ---- Weekly grid: one continuous timeline, days always Mon-Sat ---- */
+
+  .week-grid-outer {
+    display: grid;
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    font-size: 0.72rem;
+  }
+
+  .cell.header {
+    background: var(--ink);
+    color: var(--paper);
+    text-align: center;
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+    min-height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+  }
+
+  .day-col {
+    position: relative;
+    background: var(--card);
+  }
+
+  .day-col.mixed-campus {
+    background: #c9c9c9;
+  }
+
+  .day-col.time-axis {
+    background: #e5dece;
+  }
+
+  .time-tick {
+    position: absolute;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    font-family: "Courier New", monospace;
+    font-size: 0.62rem;
+    color: #555;
+    text-align: center;
+    border-top: 1px dashed var(--rule);
+    padding-top: 2px;
+  }
+
+  .class-block-abs {
+    position: absolute;
+    background: #d8ead9;
+    border-left: 3px solid var(--accent);
+    padding: 2px 4px;
+    font-size: 0.62rem;
+    overflow: hidden;
+    box-sizing: border-box;
+    border-radius: 2px;
+  }
+
+  .class-block-abs.online {
+    background: #cfe3f2;
+  }
+
+  .class-block-abs.conflict {
+    background: var(--conflict);
+  }
+
+  .prereq-inline {
+    color: #7a2e2e;
+    font-weight: bold;
+    font-size: 0.6rem;
+    margin-top: 1px;
+  }
+
+  /* ---- Seminar prompts / electives ---- */
+
+  #seminarPrompts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .seminar-prompt {
+    position: relative;
+    background: var(--card);
+    border: 1px solid var(--rule);
+    padding: 0.6rem 0.8rem;
+    border-radius: 4px;
+  }
+
+  .seminar-prompt .course-title {
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .seminar-prompt .missing {
+    color: #7a2e2e;
+    font-family: "Courier New", monospace;
+    font-size: 0.7rem;
+  }
+
+  .section-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid var(--rule);
+    padding: 0.3rem 0.6rem;
+    margin: 0.2rem 0.3rem 0.2rem 0;
+    cursor: pointer;
+    font-family: "Courier New", monospace;
+    font-size: 0.72rem;
+    border-radius: 3px;
+    background: var(--paper);
+  }
+
+  .section-pill.selected {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  #subjectFilters {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0.35rem;
+    font-family: "Courier New", monospace;
+    margin-bottom: 0.6rem;
+  }
+
+  #subjectFilters button {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    padding: 0.25rem 0.6rem;
+    font-family: inherit;
+    font-size: 0.7rem;
+    cursor: pointer;
+    border-radius: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  #subjectFilters button.active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+
+  #searchBox {
+    width: 100%;
+    padding: 0.5rem 0.7rem;
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: var(--card);
+    color: var(--ink);
+    margin-bottom: 0.7rem;
+  }
+
+  #electivePicker {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--rule);
+    padding: 0.6rem;
+    background: var(--card);
+  }
+
+  .elective-row {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.7rem;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--card);
+    font-size: 0.85rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .elective-row:last-child { margin-bottom: 0; }
+
+  .prereq-badge {
+    position: absolute;
+    top: 0.3rem;
+    right: 0.6rem;
+    color: #7a2e2e;
+    font-family: "Courier New", monospace;
+    font-size: 0.62rem;
+    font-weight: bold;
+    max-width: 50%;
+    text-align: right;
+    line-height: 1.2;
+  }
+
+  .elective-title {
+    cursor: pointer;
+  }
+
+  .elective-title:hover {
+    text-decoration: underline;
+  }
+
+  .elective-toggle {
+    font-family: "Courier New", monospace;
+    font-size: 0.72rem;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  .elective-toggle.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  .no-sections {
+    font-family: "Courier New", monospace;
+    font-size: 0.72rem;
+    color: #999;
+    padding: 0.3rem 0;
+  }
+
+  .course-title-link {
+    cursor: pointer;
+  }
+
+  .course-title-link:hover {
+    text-decoration: underline;
+  }
+
+  /* ---- Drafts ---- */
+
+  .draft-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+    font-family: "Courier New", monospace;
+    font-size: 0.8rem;
+    margin: 0.8rem 0;
+  }
+
+  .draft-controls input, .draft-controls select, .draft-controls button {
+    font-family: inherit;
+    font-size: 0.8rem;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--rule);
+    background: var(--card);
+    color: var(--ink);
+    border-radius: 3px;
+  }
+
+  .draft-controls button {
+    cursor: pointer;
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+
+  .compare-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .compare-col {
+    flex: 1;
+    min-width: 340px;
+    overflow-x: auto;
+  }
+
+  .compare-col h4 {
+    font-family: "Courier New", monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    margin: 0 0 0.4rem;
+  }
+
+  /* ---- Full-page course detail (description + comments) ---- */
+
+  .detail-view {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--paper);
+    z-index: 200;
+    overflow-y: auto;
+    padding: 2rem 1.5rem;
+  }
+
+  .detail-view.open { display: block; }
+
+  .detail-inner { max-width: 700px; margin: 0 auto; }
+
+  #detailClose {
+    font-family: "Courier New", monospace;
+    background: none;
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    padding: 0.4rem 0.8rem;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-bottom: 1.2rem;
+  }
+
+  .detail-inner h2 { margin: 0 0 0.3rem; font-size: 1.6rem; font-weight: 400; }
+
+  .detail-meta {
+    font-family: "Courier New", monospace;
+    font-size: 0.75rem;
+    color: #666;
+    margin-bottom: 1rem;
+  }
+
+  .detail-description {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .comment-item {
+    border-bottom: 1px solid var(--rule);
+    padding: 0.8rem 0;
+    font-size: 0.9rem;
+  }
+
+  .comment-item .comment-author {
+    font-weight: bold;
+  }
+
+  .comment-item .comment-author a { color: var(--accent); }
+
+  .comment-item .comment-badge {
+    font-family: "Courier New", monospace;
+    font-size: 0.65rem;
+    background: var(--accent);
+    color: white;
+    padding: 0.1rem 0.4rem;
+    border-radius: 2px;
+    margin-left: 0.4rem;
+  }
+
+  .comment-item .comment-date {
+    font-family: "Courier New", monospace;
+    font-size: 0.68rem;
+    color: #999;
+    margin-left: 0.4rem;
+  }
+
+  #commentForm {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: var(--card);
+    border: 1px solid var(--rule);
+    padding: 0.9rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+  }
+
+  #commentForm input, #commentForm textarea {
+    font-family: inherit;
+    font-size: 0.9rem;
+    padding: 0.5rem;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  #commentForm textarea { min-height: 70px; resize: vertical; }
+
+  #commentForm label {
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  #commentForm button {
+    align-self: flex-start;
+    font-family: "Courier New", monospace;
+    padding: 0.5rem 1rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  #commentStatus {
+    font-family: "Courier New", monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+  }
+</style>
+</head>
+<body>
+
+<div id="detailView" class="detail-view">
+  <div class="detail-inner">
+    <button id="detailClose">← Back</button>
+    <h2 id="detailTitle"></h2>
+    <p class="detail-meta" id="detailMeta"></p>
+    <p class="detail-description" id="detailDescription"></p>
+
+    <h3>Comments</h3>
+    <div id="commentsList"></div>
+
+    <h3>Add a Comment</h3>
+    <form id="commentForm">
+      <input type="text" id="c_author_name" placeholder="Your name" required>
+      <input type="url" id="c_author_link" placeholder="Link to you (optional)">
+      <textarea id="c_text" placeholder="Your comment" required></textarea>
+      <label><input type="checkbox" id="c_professor_unchanged" checked> Professor hasn't changed</label>
+      <button type="submit">Post comment</button>
+      <span id="commentStatus"></span>
+    </form>
+  </div>
+</div>
+
+<header>
+  <nav class="topnav">
+    <a href="index.html">Catalog</a>
+    <a href="timetable.html" class="current">Timetable Builder</a>
+    <a href="calculator.html">Calculator</a>
+    <button id="themeToggle" class="theme-toggle" type="button">🌙</button>
+  </nav>
+  <h1>Timetable Builder</h1>
+  <p class="sub">Pick your year and semester — mandatory courses fill in automatically.</p>
+</header>
+
+<main>
+  <h3>Your Program</h3>
+  <div class="program-select">
+    <label>Year
+      <select id="yearSelect">
+        <option value="">—</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+    </label>
+    <label>Semester
+      <select id="semesterSelect">
+        <option value="">—</option>
+        <option value="autumn">Autumn</option>
+        <option value="spring">Spring</option>
+      </select>
+    </label>
+  </div>
+
+  <h3>Mandatory — Seminar Group Choices</h3>
+  <div id="seminarPrompts"><p class="no-sections">Pick your year and semester above.</p></div>
+
+  <h3>Weekly Timetable</h3>
+  <div class="grid-scroll">
+    <div class="week-grid-outer" id="grid"></div>
+  </div>
+
+  <h3>Add Elective Courses</h3>
+  <div id="subjectFilters"></div>
+  <input type="text" id="searchBox" placeholder="Search by course title...">
+  <div id="electivePicker"></div>
+
+  <h3>Current Draft</h3>
+  <div class="draft-controls">
+    <input type="text" id="draftNameInput" placeholder="Draft name">
+    <button id="saveDraftBtn">Save as draft</button>
+    <select id="draftLoadSelect"></select>
+    <button id="loadDraftBtn">Load</button>
+    <button id="deleteDraftBtn">Delete</button>
+  </div>
+
+  <h3>Compare Drafts</h3>
+  <div class="draft-controls">
+    <select id="compareASelect"></select>
+    <select id="compareBSelect"></select>
+    <button id="compareBtn">Compare</button>
+  </div>
+  <div class="compare-row" id="compareRow"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="timetable.js"></script>
+
+</body>
+</html>
