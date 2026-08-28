@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Course Catalog</title>
+<title>NES Course Companion</title>
 <script>
-  // Apply saved theme before first paint, so there's no light-mode flash
   if (localStorage.getItem("theme") === "dark") {
     document.documentElement.setAttribute("data-theme", "dark");
   }
@@ -20,11 +19,11 @@
   }
 
   [data-theme="dark"] {
-    --ink: #eee9df;
-    --paper: #17160f;
-    --card: #211f18;
-    --rule: #4a4638;
-    --accent: #8fbf9c;
+    --ink: #e8e3d5;
+    --paper: #2b2a24;
+    --card: #35332b;
+    --rule: #55523f;
+    --accent: #9fcfa8;
   }
 
   * { box-sizing: border-box; }
@@ -34,13 +33,13 @@
     background: var(--paper);
     color: var(--ink);
     font-family: "Georgia", "Iowan Old Style", serif;
-    line-height: 1.4;
+    line-height: 1.5;
   }
 
   header {
     padding: 2.5rem 1.5rem 1.5rem;
     border-bottom: 2px solid var(--ink);
-    max-width: 1000px;
+    max-width: 900px;
     margin: 0 auto;
   }
 
@@ -49,6 +48,7 @@
     gap: 1rem;
     margin-bottom: 1rem;
     font-family: "Courier New", monospace;
+    align-items: center;
   }
 
   .topnav a {
@@ -60,9 +60,9 @@
   }
 
   .topnav a.current {
-    background: var(--ink);
-    color: var(--paper);
-    border-color: var(--ink);
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
   }
 
   .theme-toggle {
@@ -72,210 +72,86 @@
     border-radius: 3px;
     padding: 0.3rem 0.6rem;
     cursor: pointer;
-    font-size: 0.9rem;
-  }
-
-  @media (max-width: 640px) {
-    header, main { padding: 1.2rem 1rem; }
-    header h1 { font-size: 1.6rem; }
-    .topnav { flex-wrap: wrap; }
-    .course {
-      grid-template-columns: 1fr;
-      gap: 0.4rem;
-    }
-    .course .meta { text-align: left; }
-    .course .tag { grid-row: auto; }
-  }
-
-  header .eyebrow {
-    font-family: "Courier New", monospace;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-size: 0.75rem;
-    color: var(--accent);
-    margin: 0 0 0.4rem;
-  }
-
-  header h1 { margin: 0; font-size: 2.2rem; font-weight: 400; }
-  header p.sub { margin: 0.5rem 0 0; color: #555; font-size: 0.95rem; }
-
-  main { max-width: 1000px; margin: 0 auto; padding: 1.5rem; }
-
-  .filter-group {
-    border: 1px solid var(--rule);
-    border-radius: 4px;
-    margin-bottom: 0.6rem;
-    background: var(--card);
-  }
-
-  .filter-group summary {
-    padding: 0.6rem 1rem;
-    cursor: pointer;
     font-family: "Courier New", monospace;
     font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--accent);
-    user-select: none;
-  }
-
-  .filter-group summary:hover { background: var(--paper); }
-
-  .filters {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    gap: 0.35rem;
-    font-family: "Courier New", monospace;
-    padding: 0 1rem 0.9rem;
-  }
-
-  .filters button {
-    background: transparent;
-    border: 1px solid var(--rule);
     color: var(--ink);
-    padding: 0.25rem 0.6rem;
-    font-family: inherit;
-    font-size: 0.7rem;
-    cursor: pointer;
-    border-radius: 2px;
-    white-space: nowrap;
-    flex-shrink: 0;
   }
 
-  .filters button:hover { border-color: var(--accent); }
+  main { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
 
-  .filters button.active {
+  .hero {
+    text-align: center;
+    padding: 1.5rem 1rem 2.5rem;
+  }
+
+  .hero h1 {
+    font-size: 2.4rem;
+    font-weight: 400;
+    margin: 0 0 0.7rem;
+  }
+
+  .hero p {
+    font-size: 1.1rem;
+    color: #555;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  [data-theme="dark"] .hero p { color: #b8b3a0; }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 1.4rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card h2 {
+    font-size: 1.3rem;
+    font-weight: 400;
+    margin: 0 0 0.6rem;
+  }
+
+  .card p {
+    font-size: 0.95rem;
+    color: #555;
+    flex: 1;
+    margin: 0 0 1.2rem;
+  }
+
+  [data-theme="dark"] .card p { color: #b8b3a0; }
+
+  .card ul {
+    font-size: 0.88rem;
+    color: #555;
+    margin: 0 0 1.2rem;
+    padding-left: 1.2rem;
+  }
+
+  [data-theme="dark"] .card ul { color: #b8b3a0; }
+
+  .card a {
+    display: inline-block;
+    text-align: center;
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+    padding: 0.6rem;
     background: var(--ink);
     color: var(--paper);
-    border-color: var(--ink);
-  }
-
-  .toolbar {
-    margin: 1.2rem 0 1rem;
-    font-family: "Courier New", monospace;
-    font-size: 0.85rem;
-    color: #666;
-  }
-
-  .course-list {
-    display: grid;
-    gap: 1px;
-    background: var(--rule);
-    border: 1px solid var(--rule);
-  }
-
-  .course {
-    background: var(--card);
-    padding: 1.1rem 1.25rem;
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 0.35rem 1rem;
-    align-items: baseline;
-    cursor: pointer;
-  }
-
-  .course:hover { background: var(--paper); }
-
-  .course .tag {
-    grid-row: 1 / 3;
-    font-family: "Courier New", monospace;
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    padding: 0.2rem 0.5rem;
-    border-radius: 2px;
-    color: white;
-    align-self: start;
-    white-space: nowrap;
-  }
-
-  .course h3 { margin: 0; font-size: 1.05rem; font-weight: 400; }
-
-  .course .prof {
-    font-family: "Courier New", monospace;
-    font-size: 0.78rem;
-    color: #666;
-  }
-
-  .course .meta {
-    font-family: "Courier New", monospace;
-    font-size: 0.72rem;
-    color: #888;
-    align-self: start;
-    text-align: right;
-    line-height: 1.6;
-  }
-
-  .course .meta .mandatory {
-    display: inline-block;
-    background: #7a2e2e;
-    color: white;
-    padding: 0.1rem 0.4rem;
-    border-radius: 2px;
-    font-size: 0.65rem;
-    margin-left: 0.3rem;
-  }
-
-  .empty {
-    padding: 2rem;
-    text-align: center;
-    color: #888;
-    font-family: "Courier New", monospace;
-    font-size: 0.85rem;
-    background: var(--card);
-    border: 1px solid var(--rule);
-  }
-
-  /* ---- Full-page course detail (description + comments) ---- */
-
-  .detail-view {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: var(--paper);
-    z-index: 200;
-    overflow-y: auto;
-    padding: 2rem 1.5rem;
-  }
-
-  .detail-view.open { display: block; }
-
-  .detail-inner { max-width: 700px; margin: 0 auto; }
-
-  #detailClose {
-    font-family: "Courier New", monospace;
-    background: none;
-    border: 1px solid var(--rule);
-    color: var(--ink);
-    padding: 0.4rem 0.8rem;
+    text-decoration: none;
     border-radius: 3px;
-    cursor: pointer;
-    margin-bottom: 1.2rem;
   }
 
-  .detail-inner h2 { margin: 0 0 0.3rem; font-size: 1.6rem; font-weight: 400; }
-
-  .detail-meta {
-    font-family: "Courier New", monospace;
-    font-size: 0.75rem;
-    color: #666;
-    margin-bottom: 1rem;
-  }
-
-  .detail-description {
-    font-size: 1rem;
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
-  }
-
-  .detail-prereq {
-    font-family: "Courier New", monospace;
-    font-size: 0.8rem;
-    color: #7a2e2e;
-    font-weight: bold;
-    margin: -1rem 0 1.5rem;
-  }
+  .card a:hover { background: var(--accent); }
 
   h3.section-heading {
     font-family: "Courier New", monospace;
@@ -283,454 +159,92 @@
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--accent);
-    margin: 1.6rem 0 0.6rem;
+    margin: 2rem 0 0.8rem;
   }
 
-  .comment-item {
-    border-bottom: 1px solid var(--rule);
-    padding: 0.8rem 0;
-    font-size: 0.9rem;
-  }
-
-  .comment-item .comment-author { font-weight: bold; }
-  .comment-item .comment-author a { color: var(--accent); }
-
-  .comment-item .comment-badge {
-    font-family: "Courier New", monospace;
-    font-size: 0.65rem;
-    background: var(--accent);
-    color: white;
-    padding: 0.1rem 0.4rem;
-    border-radius: 2px;
-    margin-left: 0.4rem;
-  }
-
-  .comment-item .comment-date {
-    font-family: "Courier New", monospace;
-    font-size: 0.68rem;
-    color: #999;
-    margin-left: 0.4rem;
-  }
-
-  #commentForm {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+  .note-box {
     background: var(--card);
     border: 1px solid var(--rule);
-    padding: 0.9rem;
-    border-radius: 4px;
-    margin-top: 1rem;
+    border-radius: 6px;
+    padding: 1.2rem 1.4rem;
+    font-size: 0.92rem;
+    color: #555;
+    margin-bottom: 2rem;
   }
 
-  #commentForm input, #commentForm textarea {
-    font-family: inherit;
-    font-size: 0.9rem;
-    padding: 0.5rem;
-    border: 1px solid var(--rule);
-    border-radius: 3px;
-    background: var(--paper);
-    color: var(--ink);
-  }
+  [data-theme="dark"] .note-box { color: #b8b3a0; }
 
-  #commentForm textarea { min-height: 70px; resize: vertical; }
-
-  #commentForm label {
-    font-size: 0.85rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-
-  #commentForm button {
-    align-self: flex-start;
-    font-family: "Courier New", monospace;
-    padding: 0.5rem 1rem;
-    background: var(--ink);
-    color: var(--paper);
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-  }
-
-  #commentStatus {
-    font-family: "Courier New", monospace;
-    font-size: 0.75rem;
-    color: var(--accent);
+  @media (max-width: 640px) {
+    header, main { padding: 1.2rem 1rem; }
+    .hero h1 { font-size: 1.8rem; }
+    .topnav { flex-wrap: wrap; }
   }
 </style>
 </head>
 <body>
 
-<div id="detailView" class="detail-view">
-  <div class="detail-inner">
-    <button id="detailClose">← Back</button>
-    <h2 id="detailTitle"></h2>
-    <p class="detail-meta" id="detailMeta"></p>
-    <p class="detail-description" id="detailDescription"></p>
-    <p class="detail-prereq" id="detailPrereq"></p>
-
-    <h3 class="section-heading">Comments</h3>
-    <div id="commentsList"></div>
-
-    <h3 class="section-heading">Add a Comment</h3>
-    <form id="commentForm">
-      <input type="text" id="c_author_name" placeholder="Your name" required>
-      <input type="url" id="c_author_link" placeholder="Link to you (optional)">
-      <textarea id="c_text" placeholder="Your comment" required></textarea>
-      <label><input type="checkbox" id="c_professor_unchanged" checked> Professor hasn't changed</label>
-      <button type="submit">Post comment</button>
-      <span id="commentStatus"></span>
-    </form>
-  </div>
-</div>
-
 <header>
   <nav class="topnav">
-    <a href="index.html" class="current">Catalog</a>
+    <a href="index.html" class="current">Home</a>
+    <a href="catalog.html">Catalog</a>
     <a href="timetable.html">Timetable Builder</a>
     <a href="calculator.html">Calculator</a>
-    <button id="themeToggle" class="theme-toggle" type="button">🌙</button>
+    <button id="themeToggle" class="theme-toggle" type="button">Dark mode</button>
   </nav>
-  <p class="eyebrow">Stage 2 — Live Database</p>
-  <h1>Course Catalog</h1>
-  <p class="sub">Data fetched live from Supabase.</p>
 </header>
 
 <main>
-  <details class="filter-group" open>
-    <summary>Subjects</summary>
-    <div class="filters" id="filters"></div>
-  </details>
-
-  <details class="filter-group">
-    <summary>Professors</summary>
-    <div class="filters" id="professorFilters"></div>
-  </details>
-
-  <details class="filter-group">
-    <summary>Semester</summary>
-    <div class="filters" id="semesterFilters"></div>
-  </details>
-
-  <details class="filter-group">
-    <summary>Module</summary>
-    <div class="filters" id="moduleFilters"></div>
-  </details>
-
-  <details class="filter-group">
-    <summary>Year</summary>
-    <div class="filters" id="yearFilters"></div>
-  </details>
-
-  <details class="filter-group">
-    <summary>Mandatory</summary>
-    <div class="filters" id="mandatoryFilters"></div>
-  </details>
-
-  <div class="toolbar">
-    <span id="count"></span>
+  <div class="hero">
+    <h1>NES Course Companion</h1>
+    <p>Everything you need to pick your courses, build a conflict-free schedule, and track your degree progress — built from real course data and real student reviews.</p>
   </div>
 
-  <div class="course-list" id="courseList"></div>
+  <div class="cards">
+    <div class="card">
+      <h2>Catalog</h2>
+      <p>Browse every course with real details — professor, subject, credits, eligible years, prerequisites, and a full description.</p>
+      <ul>
+        <li>Filter by subject, professor, semester, module, year, or mandatory status</li>
+        <li>Read real student comments and ratings on each course</li>
+        <li>Post your own comment or review</li>
+      </ul>
+      <a href="catalog.html">Browse the Catalog →</a>
+    </div>
+
+    <div class="card">
+      <h2>Timetable Builder</h2>
+      <p>Pick your year and semester and your mandatory courses fill in automatically. Add electives, and see conflicts highlighted instantly.</p>
+      <ul>
+        <li>Real class times, positioned on an actual weekly clock</li>
+        <li>Overlapping classes and mixed-campus days flagged automatically</li>
+        <li>Save multiple drafts and compare them side by side</li>
+        <li>Add a course from another program if you're taking one</li>
+      </ul>
+      <a href="timetable.html">Build Your Timetable →</a>
+    </div>
+
+    <div class="card">
+      <h2>Requirement Calculator</h2>
+      <p>Mark what you've already passed and see exactly what's left before you graduate.</p>
+      <ul>
+        <li>Tracks your English level progression automatically</li>
+        <li>Checks Economics, Philosophy, Humanities, and every other subject requirement</li>
+        <li>One clear total showing what's still missing</li>
+      </ul>
+      <a href="calculator.html">Open the Calculator →</a>
+    </div>
+  </div>
+
+  <h3 class="section-heading">Worth knowing</h3>
+  <div class="note-box">
+    This is a student-built project, not an official university tool. There's no login system yet, so course data, comments, and manually-added courses are visible to everyone using the site. Some data — especially for courses without a fixed schedule yet — is still being filled in.
+  </div>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const supabaseUrl = "https://qrhhucurihbrhnerycgo.supabase.co";
-  const supabaseKey = "sb_publishable_mhkLtsXDvK3MZd6s2wdnHQ_t-xQLLih";
-  const db = supabase.createClient(supabaseUrl, supabaseKey);
-
-  const MODULE_ORDER = ["I", "II", "III", "IV"];
-  const SEMESTER_ORDER = ["autumn", "spring"];
-
-  let courses = [];
-  let subjects = [];
-
-  let activeSubjects = new Set();
-  let activeProfessors = new Set();
-  let activeSemesters = new Set();
-  let activeModules = new Set();
-  let activeYears = new Set();
-  let activeMandatory = new Set();
-
-  const filtersEl = document.getElementById("filters");
-  const professorFiltersEl = document.getElementById("professorFilters");
-  const semesterFiltersEl = document.getElementById("semesterFilters");
-  const moduleFiltersEl = document.getElementById("moduleFilters");
-  const yearFiltersEl = document.getElementById("yearFilters");
-  const mandatoryFiltersEl = document.getElementById("mandatoryFilters");
-  const listEl = document.getElementById("courseList");
-  const countEl = document.getElementById("count");
-
-  // Fixed, evenly-spaced palette so every subject gets a genuinely
-  // distinct color, instead of a hash that can collide between subjects.
-  const SUBJECT_PALETTE = [];
-  for (let i = 0; i < 18; i++) {
-    SUBJECT_PALETTE.push(`hsl(${i * 20}, 48%, 32%)`);
-  }
-  let subjectColorMap = {};
-
-  function buildSubjectColorMap() {
-    const allSubjects = [...new Set(courses.map(c => c.subject).filter(Boolean))].sort();
-    subjectColorMap = {};
-    allSubjects.forEach((subj, i) => {
-      subjectColorMap[subj] = SUBJECT_PALETTE[i % SUBJECT_PALETTE.length];
-    });
-  }
-
-  function subjectColor(subject) {
-    if (!subject) return "#888";
-    return subjectColorMap[subject] || "#888";
-  }
-
-  function toArray(value) {
-    if (Array.isArray(value)) return value;
-    if (value === null || value === undefined || value === "") return [];
-    if (typeof value === "string") {
-      const trimmed = value.trim();
-      if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
-        return trimmed.slice(1, -1).split(",").map(s => s.trim()).filter(Boolean);
-      }
-      return trimmed.split(",").map(s => s.trim()).filter(Boolean);
-    }
-    return [value];
-  }
-
-  // ---------- Full-page detail view (description + comments) ----------
-
-  const detailView = document.getElementById("detailView");
-  const detailTitle = document.getElementById("detailTitle");
-  const detailMeta = document.getElementById("detailMeta");
-  const detailDescription = document.getElementById("detailDescription");
-  const detailPrereq = document.getElementById("detailPrereq");
-  const commentsListEl = document.getElementById("commentsList");
-  const commentForm = document.getElementById("commentForm");
-  const commentStatus = document.getElementById("commentStatus");
-
-  let openCourseId = null;
-
-  document.getElementById("detailClose").addEventListener("click", closeDetail);
-
-  async function openDetail(course) {
-    openCourseId = course.id;
-    detailTitle.textContent = course.title;
-    const yearsText = toArray(course.years).join(", ");
-    const moduleText = toArray(course.module).join(", ");
-    detailMeta.textContent = `${course.subject} · ${course.professor || ""} · Yr ${yearsText || "—"} · Mod ${moduleText || "—"}${course.is_mandatory ? " · mandatory" : ""}`;
-    detailDescription.textContent = course.description && course.description.trim()
-      ? course.description
-      : "No description yet.";
-    detailPrereq.textContent = course.prerequisites && course.prerequisites.trim()
-      ? `Prerequisites: ${course.prerequisites}`
-      : "";
-    commentsListEl.innerHTML = "<p class=\"empty\">Loading comments...</p>";
-    detailView.classList.add("open");
-    window.scrollTo(0, 0);
-    await loadComments(course.id);
-  }
-
-  function closeDetail() {
-    detailView.classList.remove("open");
-    openCourseId = null;
-  }
-
-  async function loadComments(courseId) {
-    const { data, error } = await db
-      .from("comments")
-      .select("*")
-      .eq("course_id", courseId)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Error loading comments:", error);
-      commentsListEl.innerHTML = "<p class=\"empty\">Couldn't load comments.</p>";
-      return;
-    }
-
-    if (data.length === 0) {
-      commentsListEl.innerHTML = "<p class=\"empty\">No comments yet.</p>";
-      return;
-    }
-
-    commentsListEl.innerHTML = "";
-    data.forEach(c => {
-      const item = document.createElement("div");
-      item.className = "comment-item";
-      const authorHtml = c.author_link
-        ? `<a href="${c.author_link}" target="_blank" rel="noopener">${c.author_name || "Anonymous"}</a>`
-        : (c.author_name || "Anonymous");
-      const badge = c.professor_unchanged ? `<span class="comment-badge">professor unchanged</span>` : "";
-      const date = c.created_at ? new Date(c.created_at).toLocaleDateString() : "";
-      item.innerHTML = `
-        <span class="comment-author">${authorHtml}</span>${badge}<span class="comment-date">${date}</span>
-        <p>${c.comment || ""}</p>
-      `;
-      commentsListEl.appendChild(item);
-    });
-  }
-
-  commentForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if (!openCourseId) return;
-
-    const authorName = document.getElementById("c_author_name").value.trim();
-    const authorLink = document.getElementById("c_author_link").value.trim() || null;
-    const text = document.getElementById("c_text").value.trim();
-    const professorUnchanged = document.getElementById("c_professor_unchanged").checked;
-
-    commentStatus.textContent = "Posting...";
-
-    const { error } = await db.from("comments").insert({
-      course_id: openCourseId,
-      author_name: authorName,
-      author_link: authorLink,
-      comment: text,
-      professor_unchanged: professorUnchanged,
-    });
-
-    if (error) {
-      console.error("Error posting comment:", error);
-      commentStatus.textContent = "Failed to post — check the console.";
-      return;
-    }
-
-    commentForm.reset();
-    document.getElementById("c_professor_unchanged").checked = true;
-    commentStatus.textContent = "Posted.";
-    await loadComments(openCourseId);
-    setTimeout(() => { commentStatus.textContent = ""; }, 2000);
-  });
-
-  // ---------- Catalog loading/filtering ----------
-
-  async function loadCourses() {
-    const { data, error } = await db.from("courses").select("*");
-
-    if (error) {
-      console.error("Error loading courses:", error);
-      listEl.innerHTML = `<div class="empty">Couldn't load courses. Check the console.</div>`;
-      return;
-    }
-
-    courses = data;
-    subjects = [...new Set(courses.map(c => c.subject))];
-    buildSubjectColorMap();
-
-    renderAllFilters();
-    renderCourses();
-  }
-
-  function toggleInSet(set, value) {
-    if (set.has(value)) set.delete(value);
-    else set.add(value);
-  }
-
-  function renderButtonGroup(container, values, activeSet, allLabel, onChange) {
-    container.innerHTML = "";
-
-    const allBtn = document.createElement("button");
-    allBtn.textContent = allLabel;
-    if (activeSet.size === 0) allBtn.classList.add("active");
-    allBtn.addEventListener("click", () => {
-      activeSet.clear();
-      onChange();
-    });
-    container.appendChild(allBtn);
-
-    values.forEach(value => {
-      const btn = document.createElement("button");
-      btn.textContent = value;
-      if (activeSet.has(value)) btn.classList.add("active");
-      btn.addEventListener("click", () => {
-        toggleInSet(activeSet, value);
-        onChange();
-      });
-      container.appendChild(btn);
-    });
-  }
-
-  function refresh() {
-    renderAllFilters();
-    renderCourses();
-  }
-
-  function renderAllFilters() {
-    renderButtonGroup(filtersEl, subjects, activeSubjects, "All subjects", refresh);
-
-    const bySubject = activeSubjects.size === 0
-      ? courses
-      : courses.filter(c => activeSubjects.has(c.subject));
-    const professors = [...new Set(bySubject.map(c => c.professor))].sort();
-    renderButtonGroup(professorFiltersEl, professors, activeProfessors, "All professors", refresh);
-
-    const semesters = [...new Set(courses.map(c => c.semester).filter(Boolean))]
-      .sort((a, b) => SEMESTER_ORDER.indexOf(a) - SEMESTER_ORDER.indexOf(b));
-    renderButtonGroup(semesterFiltersEl, semesters, activeSemesters, "All semesters", refresh);
-
-    const modules = [...new Set(courses.flatMap(c => toArray(c.module)))]
-      .sort((a, b) => MODULE_ORDER.indexOf(a) - MODULE_ORDER.indexOf(b));
-    renderButtonGroup(moduleFiltersEl, modules, activeModules, "All modules", refresh);
-
-    const years = [...new Set(courses.flatMap(c => toArray(c.years)))].sort((a, b) => a - b);
-    renderButtonGroup(yearFiltersEl, years, activeYears, "All years", refresh);
-
-    renderButtonGroup(mandatoryFiltersEl, ["yes", "no"], activeMandatory, "All courses", refresh);
-  }
-
-  function arrayOverlaps(arr, activeSet) {
-    if (activeSet.size === 0) return true;
-    return toArray(arr).some(v => activeSet.has(v));
-  }
-
-  function renderCourses() {
-    let visible = courses.filter(c => {
-      const subjectMatch = activeSubjects.size === 0 || activeSubjects.has(c.subject);
-      const professorMatch = activeProfessors.size === 0 || activeProfessors.has(c.professor);
-      const semesterMatch = activeSemesters.size === 0 || activeSemesters.has(c.semester);
-      const moduleMatch = arrayOverlaps(c.module, activeModules);
-      const yearMatch = arrayOverlaps(c.years, activeYears);
-      const mandatoryMatch = activeMandatory.size === 0
-        || (activeMandatory.has("yes") && c.is_mandatory)
-        || (activeMandatory.has("no") && !c.is_mandatory);
-      return subjectMatch && professorMatch && semesterMatch && moduleMatch && yearMatch && mandatoryMatch;
-    });
-
-    visible.sort((a, b) => a.title.localeCompare(b.title, ["ru", "en"]));
-
-    countEl.textContent = `${visible.length} course${visible.length === 1 ? "" : "s"}`;
-    listEl.innerHTML = "";
-
-    if (visible.length === 0) {
-      listEl.innerHTML = `<div class="empty">No courses match this filter.</div>`;
-      return;
-    }
-
-    visible.forEach(c => {
-      const row = document.createElement("div");
-      row.className = "course";
-
-      const yearsText = toArray(c.years).join(", ");
-      const moduleText = toArray(c.module).join(", ");
-      const mandatoryBadge = c.is_mandatory ? `<span class="mandatory">required</span>` : "";
-
-      row.innerHTML = `
-        <span class="tag" style="background:${subjectColor(c.subject)}">${c.subject}</span>
-        <h3>${c.title}</h3>
-        <span class="meta">
-          Yr ${yearsText || "—"} · Mod ${moduleText || "—"}${mandatoryBadge}
-        </span>
-        <span class="prof">${c.professor}</span>
-      `;
-      row.addEventListener("click", () => openDetail(c));
-      listEl.appendChild(row);
-    });
-  }
-
-  // ---------- Theme toggle ----------
   const themeToggle = document.getElementById("themeToggle");
   function updateThemeButton() {
-    themeToggle.textContent = document.documentElement.getAttribute("data-theme") === "dark" ? "☀️" : "🌙";
+    themeToggle.textContent = document.documentElement.getAttribute("data-theme") === "dark" ? "Light mode" : "Dark mode";
   }
   themeToggle.addEventListener("click", () => {
     const isDark = document.documentElement.getAttribute("data-theme") === "dark";
@@ -744,8 +258,6 @@
     updateThemeButton();
   });
   updateThemeButton();
-
-  loadCourses();
 </script>
 
 </body>

@@ -19,11 +19,11 @@
   }
 
   [data-theme="dark"] {
-    --ink: #eee9df;
-    --paper: #17160f;
-    --card: #211f18;
-    --rule: #4a4638;
-    --accent: #8fbf9c;
+    --ink: #e8e3d5;
+    --paper: #2b2a24;
+    --card: #35332b;
+    --rule: #55523f;
+    --accent: #9fcfa8;
   }
 
   * { box-sizing: border-box; }
@@ -60,9 +60,9 @@
   }
 
   .topnav a.current {
-    background: var(--ink);
-    color: var(--paper);
-    border-color: var(--ink);
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
   }
 
   .theme-toggle {
@@ -72,7 +72,9 @@
     border-radius: 3px;
     padding: 0.3rem 0.6rem;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-family: "Courier New", monospace;
+    font-size: 0.8rem;
+    color: var(--ink);
   }
 
   header h1 { margin: 0; font-size: 2rem; font-weight: 400; }
@@ -191,10 +193,11 @@
 
 <header>
   <nav class="topnav">
-    <a href="index.html">Catalog</a>
+    <a href="index.html">Home</a>
+    <a href="catalog.html">Catalog</a>
     <a href="timetable.html">Timetable Builder</a>
     <a href="calculator.html" class="current">Calculator</a>
-    <button id="themeToggle" class="theme-toggle" type="button">🌙</button>
+    <button id="themeToggle" class="theme-toggle" type="button">Dark mode</button>
   </nav>
   <h1>Requirement Calculator</h1>
   <p class="sub">Track what you've passed and see what's still needed for your degree.</p>
@@ -223,6 +226,8 @@
   </div>
 
   <div id="wizard" style="display:none;">
+    <div id="resultsArea"></div>
+
     <h3>English</h3>
     <p class="progress-line" id="englishProgress"></p>
     <div class="checklist" id="englishList"></div>
@@ -239,13 +244,7 @@
     <p class="progress-line" id="humanitiesProgress"></p>
     <div class="checklist" id="humanitiesList"></div>
 
-    <h3>Social</h3>
-    <div class="checklist" id="socialList"></div>
-
-    <h3>Science &amp; Math</h3>
-    <div class="checklist" id="scienceMathList"></div>
-
-    <div id="resultsArea"></div>
+    <div id="otherSubjectsContainer"></div>
   </div>
 
   <p class="no-sections" id="promptMessage">Pick your year and starting English level above to begin.</p>

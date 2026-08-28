@@ -20,11 +20,11 @@
   }
 
   [data-theme="dark"] {
-    --ink: #eee9df;
-    --paper: #17160f;
-    --card: #211f18;
-    --rule: #4a4638;
-    --accent: #8fbf9c;
+    --ink: #e8e3d5;
+    --paper: #2b2a24;
+    --card: #35332b;
+    --rule: #55523f;
+    --accent: #9fcfa8;
     --conflict: #7a3a36;
   }
 
@@ -50,6 +50,7 @@
     gap: 1rem;
     margin-bottom: 1rem;
     font-family: "Courier New", monospace;
+    align-items: center;
   }
 
   .topnav a {
@@ -61,9 +62,9 @@
   }
 
   .topnav a.current {
-    background: var(--ink);
-    color: var(--paper);
-    border-color: var(--ink);
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
   }
 
   .theme-toggle {
@@ -73,20 +74,9 @@
     border-radius: 3px;
     padding: 0.3rem 0.6rem;
     cursor: pointer;
-    font-size: 0.9rem;
-  }
-
-  .grid-scroll {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  @media (max-width: 640px) {
-    header, main { padding: 1.2rem 1rem; }
-    header h1 { font-size: 1.5rem; }
-    .topnav { flex-wrap: wrap; }
-    .week-grid-outer { min-width: 620px; }
-    .program-select { flex-wrap: wrap; }
+    font-family: "Courier New", monospace;
+    font-size: 0.8rem;
+    color: var(--ink);
   }
 
   header h1 { margin: 0; font-size: 2rem; font-weight: 400; }
@@ -105,10 +95,11 @@
 
   .program-select {
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
     font-family: "Courier New", monospace;
     font-size: 0.85rem;
     align-items: center;
+    flex-wrap: wrap;
   }
 
   .program-select select {
@@ -119,6 +110,125 @@
     background: var(--card);
     color: var(--ink);
     border-radius: 3px;
+  }
+
+  #externalCourseForm {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 1rem;
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+  }
+
+  .external-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+
+  .external-fields label, .meeting-builder label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-size: 0.75rem;
+  }
+
+  .external-fields input, .meeting-builder input, .meeting-builder select {
+    font-family: inherit;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.5rem;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 3px;
+  }
+
+  .meeting-builder {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: flex-end;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .meeting-builder button {
+    font-family: inherit;
+    font-size: 0.8rem;
+    padding: 0.45rem 0.8rem;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    height: fit-content;
+  }
+
+  #pendingMeetingsList {
+    margin-bottom: 1rem;
+  }
+
+  .pending-meeting {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 0.3rem 0.6rem;
+    margin: 0.2rem 0.3rem 0.2rem 0;
+    font-size: 0.75rem;
+  }
+
+  .pending-meeting button {
+    background: none;
+    border: none;
+    color: #7a2e2e;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.85rem;
+    padding: 0;
+  }
+
+  #submitExternalCourse {
+    font-family: "Courier New", monospace;
+    padding: 0.6rem 1.2rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  #externalCourseStatus {
+    margin-left: 0.7rem;
+    font-size: 0.8rem;
+    color: var(--accent);
+  }
+
+  .semester-toggle {
+    display: flex;
+    gap: 0.4rem;
+  }
+
+  .sem-btn {
+    font-family: inherit;
+    font-size: 0.8rem;
+    padding: 0.45rem 1rem;
+    border: 1px solid var(--rule);
+    background: var(--card);
+    color: var(--ink);
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  .sem-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
   }
 
   /* ---- Weekly grid: one continuous timeline, days always Mon-Sat ---- */
@@ -196,6 +306,11 @@
     margin-top: 1px;
   }
 
+  .grid-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   /* ---- Seminar prompts / electives ---- */
 
   #seminarPrompts {
@@ -241,6 +356,11 @@
     background: var(--accent);
     color: white;
     border-color: var(--accent);
+  }
+
+  .section-pill:hover:not(.selected) {
+    border-color: var(--accent);
+    background: var(--paper);
   }
 
   #subjectFilters {
@@ -403,11 +523,23 @@
     overflow-x: auto;
   }
 
+  .compare-col .grid {
+    min-width: 220px;
+  }
+
   .compare-col h4 {
     font-family: "Courier New", monospace;
     font-size: 0.8rem;
     color: var(--accent);
     margin: 0 0 0.4rem;
+  }
+
+  @media (max-width: 640px) {
+    header, main { padding: 1.2rem 1rem; }
+    header h1 { font-size: 1.5rem; }
+    .topnav { flex-wrap: wrap; }
+    .week-grid-outer { min-width: 620px; }
+    .program-select { flex-wrap: wrap; }
   }
 
   /* ---- Full-page course detail (description + comments) ---- */
@@ -437,19 +569,67 @@
     margin-bottom: 1.2rem;
   }
 
-  .detail-inner h2 { margin: 0 0 0.3rem; font-size: 1.6rem; font-weight: 400; }
+  .detail-inner h2 { margin: 0 0 0.4rem; font-size: 1.8rem; font-weight: 400; }
 
-  .detail-meta {
+  .new-badge {
+    display: none;
+    background: #e0b04f;
+    color: #3a2e12;
     font-family: "Courier New", monospace;
-    font-size: 0.75rem;
-    color: #666;
-    margin-bottom: 1rem;
+    font-size: 0.68rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.25rem 0.6rem;
+    border-radius: 3px;
+    margin-bottom: 0.6rem;
+  }
+
+  .detail-subline {
+    font-size: 1.1rem;
+    color: var(--ink);
+    margin: 0 0 0.5rem;
+  }
+
+  .detail-credits {
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+    font-size: 0.95rem;
+    color: var(--accent);
+    margin: 0 0 0.8rem;
+  }
+
+  .detail-prereq {
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+    color: #7a2e2e;
+    font-weight: bold;
+    margin: 0 0 1rem;
   }
 
   .detail-description {
     font-size: 1rem;
     line-height: 1.6;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .detail-attachment {
+    margin: 0 0 1.5rem;
+  }
+
+  .detail-attachment a {
+    color: var(--accent);
+    font-weight: bold;
+    text-decoration: underline;
+  }
+
+  h3.section-heading {
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    margin: 1.6rem 0 0.6rem;
   }
 
   .comment-item {
@@ -458,10 +638,7 @@
     font-size: 0.9rem;
   }
 
-  .comment-item .comment-author {
-    font-weight: bold;
-  }
-
+  .comment-item .comment-author { font-weight: bold; }
   .comment-item .comment-author a { color: var(--accent); }
 
   .comment-item .comment-badge {
@@ -535,18 +712,23 @@
   <div class="detail-inner">
     <button id="detailClose">← Back</button>
     <h2 id="detailTitle"></h2>
-    <p class="detail-meta" id="detailMeta"></p>
+    <span id="detailNewBadge" class="new-badge">New Course</span>
+    <p class="detail-subline" id="detailSubline"></p>
+    <p class="detail-credits" id="detailCredits"></p>
+    <p class="detail-prereq" id="detailPrereq"></p>
     <p class="detail-description" id="detailDescription"></p>
+    <p class="detail-attachment" id="detailAttachment"></p>
 
-    <h3>Comments</h3>
+    <h3 class="section-heading">Comments</h3>
     <div id="commentsList"></div>
 
-    <h3>Add a Comment</h3>
+    <h3 class="section-heading">Add a Comment</h3>
     <form id="commentForm">
       <input type="text" id="c_author_name" placeholder="Your name" required>
-      <input type="url" id="c_author_link" placeholder="Link to you (optional)">
+      <input type="text" id="c_author_link" placeholder="@yourhandle (e.g. Telegram)">
       <textarea id="c_text" placeholder="Your comment" required></textarea>
       <label><input type="checkbox" id="c_professor_unchanged" checked> Professor hasn't changed</label>
+      <label><input type="checkbox" id="c_consent" required> I consent not to write anything inappropriate and understand that otherwise my comment may be deleted</label>
       <button type="submit">Post comment</button>
       <span id="commentStatus"></span>
     </form>
@@ -555,10 +737,11 @@
 
 <header>
   <nav class="topnav">
-    <a href="index.html">Catalog</a>
+    <a href="index.html">Home</a>
+    <a href="catalog.html">Catalog</a>
     <a href="timetable.html" class="current">Timetable Builder</a>
     <a href="calculator.html">Calculator</a>
-    <button id="themeToggle" class="theme-toggle" type="button">🌙</button>
+    <button id="themeToggle" class="theme-toggle" type="button">Dark mode</button>
   </nav>
   <h1>Timetable Builder</h1>
   <p class="sub">Pick your year and semester — mandatory courses fill in automatically.</p>
@@ -576,14 +759,22 @@
         <option value="4">4</option>
       </select>
     </label>
-    <label>Semester
-      <select id="semesterSelect">
+    <div class="semester-toggle">
+      <button class="sem-btn" data-sem="autumn" type="button">Autumn</button>
+      <button class="sem-btn" data-sem="spring" type="button">Spring</button>
+    </div>
+    <label>Starting English level
+      <select id="englishStartSelect">
         <option value="">—</option>
-        <option value="autumn">Autumn</option>
-        <option value="spring">Spring</option>
+        <option value="100">100 (Beginner)</option>
+        <option value="200">200 (Intermediate)</option>
+        <option value="300">300 (Advanced)</option>
       </select>
     </label>
   </div>
+
+  <h3>English Requirement</h3>
+  <div id="englishGroupPrompt"><p class="no-sections">Pick your year, semester, and starting English level above.</p></div>
 
   <h3>Mandatory — Seminar Group Choices</h3>
   <div id="seminarPrompts"><p class="no-sections">Pick your year and semester above.</p></div>
@@ -597,6 +788,60 @@
   <div id="subjectFilters"></div>
   <input type="text" id="searchBox" placeholder="Search by course title...">
   <div id="electivePicker"></div>
+
+  <h3>Add a Course from Another Program</h3>
+  <form id="externalCourseForm">
+    <div class="external-fields">
+      <label>Course title
+        <input type="text" id="ext_title" required>
+      </label>
+      <label>Program
+        <input type="text" id="ext_program" placeholder="e.g. HSE Economics" required>
+      </label>
+      <label>Professor
+        <input type="text" id="ext_professor">
+      </label>
+      <label>Credits
+        <input type="number" id="ext_credits" value="6" min="1">
+      </label>
+      <label>Subject
+        <input type="text" id="ext_subject" list="knownSubjects" placeholder="e.g. economics">
+        <datalist id="knownSubjects"></datalist>
+      </label>
+      <label>Campus
+        <select id="ext_campus">
+          <option value="">—</option>
+          <option value="NES">NES</option>
+          <option value="HSE">HSE</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="meeting-builder">
+      <label>Day
+        <select id="ext_day">
+          <option value="Понедельник">Monday</option>
+          <option value="Вторник">Tuesday</option>
+          <option value="Среда">Wednesday</option>
+          <option value="Четверг">Thursday</option>
+          <option value="Пятница">Friday</option>
+          <option value="Суббота">Saturday</option>
+        </select>
+      </label>
+      <label>Start
+        <input type="text" id="ext_start" placeholder="e.g. 11:00">
+      </label>
+      <label>End
+        <input type="text" id="ext_end" placeholder="e.g. 12:20">
+      </label>
+      <button type="button" id="addMeetingBtn">+ Add meeting time</button>
+    </div>
+
+    <div id="pendingMeetingsList"></div>
+
+    <button type="submit" id="submitExternalCourse">Add course to my timetable</button>
+    <span id="externalCourseStatus"></span>
+  </form>
 
   <h3>Current Draft</h3>
   <div class="draft-controls">
