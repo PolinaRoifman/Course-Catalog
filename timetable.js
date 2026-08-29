@@ -51,7 +51,6 @@ const seminarPromptsEl = document.getElementById("seminarPrompts");
 const mandatoryCoursesListEl = document.getElementById("mandatoryCoursesList");
 const gridEl = document.getElementById("grid");
 const subjectFiltersEl = document.getElementById("subjectFilters");
-const searchBoxEl = document.getElementById("searchBox");
 const electivePickerEl = document.getElementById("electivePicker");
 
 const draftNameInput = document.getElementById("draftNameInput");
@@ -429,7 +428,7 @@ function getAllSelectedIds() {
 
 yearSelect.addEventListener("change", () => {
   selectedYear = yearSelect.value || null;
-  renderElectivePicker(searchBoxEl.value);
+  renderElectivePicker();
   renderMandatoryCoursesList();
   renderSeminarPrompts();
   renderEnglishGroupPrompt();
@@ -441,7 +440,7 @@ document.querySelectorAll(".sem-btn").forEach(btn => {
     document.querySelectorAll(".sem-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     selectedSemester = btn.dataset.sem;
-    renderElectivePicker(searchBoxEl.value);
+    renderElectivePicker();
     renderMandatoryCoursesList();
   renderSeminarPrompts();
     renderEnglishGroupPrompt();
@@ -452,7 +451,7 @@ document.querySelectorAll(".sem-btn").forEach(btn => {
 englishStartSelect.addEventListener("change", () => {
   englishStartLevel = englishStartSelect.value || null;
   chosenEnglishGroup = null; // starting level changed, previous group choice no longer valid
-  renderElectivePicker(searchBoxEl.value);
+  renderElectivePicker();
   renderEnglishGroupPrompt();
   renderGrid(gridEl, getAllSelectedIds());
 });
@@ -620,7 +619,7 @@ function renderSubjectFilters() {
   allBtn.addEventListener("click", () => {
     activeSubjects.clear();
     renderSubjectFilters();
-    renderElectivePicker(searchBoxEl.value);
+    renderElectivePicker();
   });
   subjectFiltersEl.appendChild(allBtn);
 
@@ -632,7 +631,7 @@ function renderSubjectFilters() {
       if (activeSubjects.has(subject)) activeSubjects.delete(subject);
       else activeSubjects.add(subject);
       renderSubjectFilters();
-      renderElectivePicker(searchBoxEl.value);
+      renderElectivePicker();
     });
     subjectFiltersEl.appendChild(btn);
   });
@@ -706,7 +705,6 @@ function renderElectivePicker(filterText = "") {
   });
 }
 
-searchBoxEl.addEventListener("input", () => renderElectivePicker(searchBoxEl.value));
 
 // ---------- Weekly grid ----------
 
@@ -999,7 +997,7 @@ document.getElementById("loadDraftBtn").addEventListener("click", () => {
   electiveCourseIds = new Set(payload.electiveCourseIds || []);
   removedMandatoryIds = new Set(payload.removedMandatoryIds || []);
 
-  renderElectivePicker(searchBoxEl.value);
+  renderElectivePicker();
   renderMandatoryCoursesList();
   renderSeminarPrompts();
   renderEnglishGroupPrompt();
@@ -1162,7 +1160,7 @@ externalCourseForm.addEventListener("submit", async (e) => {
   // then drop it straight into the current draft.
   await loadAll();
   electiveCourseIds.add(newCourse.id);
-  renderElectivePicker(searchBoxEl.value);
+  renderElectivePicker();
   renderMandatoryCoursesList();
   renderSeminarPrompts();
   renderEnglishGroupPrompt();
