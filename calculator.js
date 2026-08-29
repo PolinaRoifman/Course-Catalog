@@ -6,12 +6,18 @@ let courses = [];
 let selectedYear = null;
 let englishStartLevel = null;
 let passedCourseIds = new Set();
+let outsideCredits = []; // [{ id, category, credits }] -- manually added, not tied to a real course
 
 const yearSelect = document.getElementById("yearSelect");
 const englishStartSelect = document.getElementById("englishStartSelect");
 const wizardEl = document.getElementById("wizard");
 const promptMessageEl = document.getElementById("promptMessage");
 const resultsAreaEl = document.getElementById("resultsArea");
+const outsideCreditsForm = document.getElementById("outsideCreditsForm");
+const ocCategory = document.getElementById("oc_category");
+const ocCredits = document.getElementById("oc_credits");
+const outsideCreditsStatus = document.getElementById("outsideCreditsStatus");
+const outsideCreditsListEl = document.getElementById("outsideCreditsList");
 
 function toArray(value) {
   if (Array.isArray(value)) return value;
@@ -35,9 +41,9 @@ function isAvailableToYear(course, year) {
 // unclassified and excluded from the level checklist.
 function inferEnglishLevel(title) {
   const t = (title || "").toLowerCase();
-  if (t.includes("beginner")) return 100;
-  if (t.includes("intermediate")) return 200;
-  if (t.includes("advanced")) return 300;
+  if (t.includes("beginner") || t.includes("начинающ")) return 100;
+  if (t.includes("intermediate") || t.includes("промежуточн")) return 200;
+  if (t.includes("advanced") || t.includes("продвинут")) return 300;
   return null;
 }
 
@@ -70,7 +76,66 @@ async function loadCourses() {
     return;
   }
   courses = data;
+  populateOutsideCreditCategories();
 }
+
+// ---------- Outside credits: manually add credits not tied to a real course ----------
+
+function categoryLabel(category) {
+  if (category.startsWith("english")) return `English ${category.replace("english", "")}`;
+  return category.charAt(0).toUpperCase() + category.slice(1);
+}
+
+function populateOutsideCreditCategories() {
+  const otherSubjects = [...new Set(courses.map(c => c.subject).filter(Boolean))]
+    .filter(s => !["english"].includes(s))
+    .sort();
+
+  const categories = ["english100", "english200", "english300", ...otherSubjects];
+
+  ocCategory.innerHTML = categories
+    .map(cat => `<option value="${cat}">${categoryLabel(cat)}</option>`)
+    .join("");
+}
+
+function sumOutsideCredits(category) {
+  return outsideCredits
+    .filter(e => e.category === category)
+    .reduce((sum, e) => sum + e.credits, 0);
+}
+
+function renderOutsideCreditsList() {
+  outsideCreditsListEl.innerHTML = "";
+  outsideCredits.forEach(entry => {
+    const row = document.createElement("div");
+    row.className = "outside-credit-row";
+    row.innerHTML = `<span>${categoryLabel(entry.category)}: ${entry.credits} cr</span>`;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "✕";
+    btn.addEventListener("click", () => {
+      outsideCredits = outsideCredits.filter(e => e.id !== entry.id);
+      renderOutsideCreditsList();
+      renderWizard();
+    });
+    row.appendChild(btn);
+    outsideCreditsListEl.appendChild(row);
+  });
+}
+
+outsideCreditsForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const credits = Number(ocCredits.value);
+  if (!credits || credits <= 0) {
+    outsideCreditsStatus.textContent = "Enter a positive number of credits.";
+    return;
+  }
+  outsideCredits.push({ id: Date.now() + Math.random(), category: ocCategory.value, credits });
+  renderOutsideCreditsList();
+  renderWizard();
+  outsideCreditsStatus.textContent = "Added.";
+  setTimeout(() => { outsideCreditsStatus.textContent = ""; }, 1500);
+});
 
 function creditsOf(course) {
   return course.credits || 6;
@@ -176,7 +241,7 @@ function renderWizard() {
   const requiredTiers = [100, 200, 300].filter(t => t >= Number(englishStartLevel));
   const tierProgress = requiredTiers.map(tier => {
     const tierCourses = englishCourses.filter(c => c._level === tier);
-    const sum = sumPassedCredits(tierCourses);
+    const sum = sumPassedCredits(tierCourses) + sumOutsideCredits(`english${tier}`);
     return { tier, sum, need: Math.max(0, 12 - sum) };
   });
   document.getElementById("englishProgress").textContent = tierProgress
@@ -189,7 +254,7 @@ function renderWizard() {
     .filter(available)
     .sort((a, b) => a.title.localeCompare(b.title, ["ru", "en"]));
   renderChecklist(document.getElementById("economicsList"), economicsCourses, "No matching Economics courses available to you yet.");
-  const economicsSum = sumPassedCredits(economicsCourses);
+  const economicsSum = sumPassedCredits(economicsCourses) + sumOutsideCredits("economics");
   document.getElementById("economicsProgress").textContent = `${economicsSum}/42 credits`;
 
   // ---- Philosophy: at least 6 credits ----
@@ -198,7 +263,7 @@ function renderWizard() {
     .filter(available)
     .sort((a, b) => a.title.localeCompare(b.title, ["ru", "en"]));
   renderChecklist(document.getElementById("philosophyList"), philosophyCourses, "No matching Philosophy courses available to you yet.");
-  const philosophySum = sumPassedCredits(philosophyCourses);
+  const philosophySum = sumPassedCredits(philosophyCourses) + sumOutsideCredits("philosophy");
   document.getElementById("philosophyProgress").textContent = `${philosophySum}/6 credits`;
 
   // ---- Humanities: at least 6 credits ----
@@ -207,7 +272,7 @@ function renderWizard() {
     .filter(available)
     .sort((a, b) => a.title.localeCompare(b.title, ["ru", "en"]));
   renderChecklist(document.getElementById("humanitiesList"), humanitiesCourses, "No matching Humanities courses available to you yet.");
-  const humanitiesSum = sumPassedCredits(humanitiesCourses);
+  const humanitiesSum = sumPassedCredits(humanitiesCourses) + sumOutsideCredits("humanities");
   document.getElementById("humanitiesProgress").textContent = `${humanitiesSum}/6 credits`;
 
   // ---- Every other subject tag actually present in the data, its own section ----
@@ -229,7 +294,7 @@ function renderWizard() {
       .filter(available)
       .sort((a, b) => a.title.localeCompare(b.title, ["ru", "en"]));
 
-    const sum = sumPassedCredits(subjCourses);
+    const sum = sumPassedCredits(subjCourses) + sumOutsideCredits(subject);
     otherSums[subject] = sum;
 
     if (KNOWN_MINIMUMS[subject]) {
@@ -260,7 +325,7 @@ function renderWizard() {
     }
   });
 
-  const overallCredits = sumPassedCredits(courses);
+  const overallCredits = sumPassedCredits(courses) + outsideCredits.reduce((s, e) => s + e.credits, 0);
 
   resultsAreaEl.innerHTML = "";
   const banner = document.createElement("div");
