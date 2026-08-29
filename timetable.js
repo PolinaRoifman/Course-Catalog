@@ -40,6 +40,7 @@ let englishStartLevel = null;
 let chosenEnglishGroup = null; // course_id of the chosen English section, or null
 
 let electiveCourseIds = new Set();
+let removedMandatoryIds = new Set(); // mandatory courses the student chose to drop
 let chosenSeminarByCourse = {};
 let activeSubjects = new Set();
 
@@ -47,6 +48,7 @@ const yearSelect = document.getElementById("yearSelect");
 const englishStartSelect = document.getElementById("englishStartSelect");
 const englishGroupPromptEl = document.getElementById("englishGroupPrompt");
 const seminarPromptsEl = document.getElementById("seminarPrompts");
+const mandatoryCoursesListEl = document.getElementById("mandatoryCoursesList");
 const gridEl = document.getElementById("grid");
 const subjectFiltersEl = document.getElementById("subjectFilters");
 const searchBoxEl = document.getElementById("searchBox");
@@ -206,6 +208,7 @@ async function loadAll() {
 
   renderSubjectFilters();
   renderElectivePicker();
+  renderMandatoryCoursesList();
   renderSeminarPrompts();
   renderEnglishGroupPrompt();
   renderGrid(gridEl, getAllSelectedIds());
@@ -372,7 +375,9 @@ function getMandatoryCourses() {
 
 function getActiveCourseIds() {
   const mandatoryCourses = getMandatoryCourses();
-  const mandatoryIds = mandatoryCourses.map(c => c.id);
+  const mandatoryIds = mandatoryCourses
+    .map(c => c.id)
+    .filter(id => !removedMandatoryIds.has(id)); // student opted out
   mandatoryIds.forEach(id => electiveCourseIds.delete(id));
 
   // Grouped English courses are handled entirely by the English
@@ -417,6 +422,7 @@ function getAllSelectedIds() {
 yearSelect.addEventListener("change", () => {
   selectedYear = yearSelect.value || null;
   renderElectivePicker(searchBoxEl.value);
+  renderMandatoryCoursesList();
   renderSeminarPrompts();
   renderEnglishGroupPrompt();
   renderGrid(gridEl, getAllSelectedIds());
@@ -428,7 +434,8 @@ document.querySelectorAll(".sem-btn").forEach(btn => {
     btn.classList.add("active");
     selectedSemester = btn.dataset.sem;
     renderElectivePicker(searchBoxEl.value);
-    renderSeminarPrompts();
+    renderMandatoryCoursesList();
+  renderSeminarPrompts();
     renderEnglishGroupPrompt();
     renderGrid(gridEl, getAllSelectedIds());
   });
@@ -447,6 +454,56 @@ function setSemesterButtons(sem) {
 }
 
 // ---------- Seminar group prompts ----------
+
+function renderMandatoryCoursesList() {
+  mandatoryCoursesListEl.innerHTML = "";
+
+  if (!selectedYear || !selectedSemester) {
+    mandatoryCoursesListEl.innerHTML = `<p class="no-sections">Pick your year and semester above.</p>`;
+    return;
+  }
+
+  const groupedEnglishIds = new Set(getGroupedEnglishCourses().map(c => c.id));
+  const mandatoryCourses = getMandatoryCourses().filter(c => !groupedEnglishIds.has(c.id));
+
+  if (mandatoryCourses.length === 0) {
+    mandatoryCoursesListEl.innerHTML = `<p class="no-sections">No mandatory courses for this year/semester.</p>`;
+    return;
+  }
+
+  mandatoryCourses
+    .sort((a, b) => a.title.localeCompare(b.title, ["ru", "en"]))
+    .forEach(course => {
+      const row = document.createElement("div");
+      row.className = "elective-row";
+
+      const isRemoved = removedMandatoryIds.has(course.id);
+
+      const label = document.createElement("span");
+      label.className = "elective-title";
+      label.textContent = course.title;
+      label.addEventListener("click", () => openDetail(course));
+      row.appendChild(label);
+
+      const btn = document.createElement("button");
+      btn.className = "elective-toggle" + (isRemoved ? "" : " active");
+      btn.textContent = isRemoved ? "Add back" : "Remove";
+      btn.addEventListener("click", () => {
+        if (isRemoved) {
+          removedMandatoryIds.delete(course.id);
+        } else {
+          removedMandatoryIds.add(course.id);
+          delete chosenSeminarByCourse[course.id]; // no point keeping a group choice for a dropped course
+        }
+        renderMandatoryCoursesList();
+        renderSeminarPrompts();
+        renderGrid(gridEl, getAllSelectedIds());
+      });
+      row.appendChild(btn);
+
+      mandatoryCoursesListEl.appendChild(row);
+    });
+}
 
 function renderSeminarPrompts() {
   seminarPromptsEl.innerHTML = "";
@@ -779,6 +836,7 @@ function saveDraft(name) {
     chosenEnglishGroup,
     chosenSeminarByCourse,
     electiveCourseIds: [...electiveCourseIds],
+    removedMandatoryIds: [...removedMandatoryIds],
   };
   localStorage.setItem(`draft:${name}`, JSON.stringify(payload));
   const names = getDraftNames();
@@ -845,12 +903,15 @@ function idsForDraftPayload(payload) {
 
   const groupedEnglishIds = groupedEnglishCourseIdsFor(payload.year, payload.semester, payload.englishStartLevel);
 
+  const removedIds = new Set(payload.removedMandatoryIds || []);
+
   const mandatoryCourseIds = courses
     .filter(c =>
       c.is_mandatory &&
       toArray(c.years).map(Number).includes(Number(payload.year)) &&
       c.semester === payload.semester &&
-      !groupedEnglishIds.has(c.id)
+      !groupedEnglishIds.has(c.id) &&
+      !removedIds.has(c.id)
     )
     .map(c => c.id);
 
@@ -913,8 +974,10 @@ document.getElementById("loadDraftBtn").addEventListener("click", () => {
   setSemesterButtons(selectedSemester);
   chosenSeminarByCourse = payload.chosenSeminarByCourse || {};
   electiveCourseIds = new Set(payload.electiveCourseIds || []);
+  removedMandatoryIds = new Set(payload.removedMandatoryIds || []);
 
   renderElectivePicker(searchBoxEl.value);
+  renderMandatoryCoursesList();
   renderSeminarPrompts();
   renderEnglishGroupPrompt();
   renderGrid(gridEl, getAllSelectedIds());
@@ -1077,6 +1140,7 @@ externalCourseForm.addEventListener("submit", async (e) => {
   await loadAll();
   electiveCourseIds.add(newCourse.id);
   renderElectivePicker(searchBoxEl.value);
+  renderMandatoryCoursesList();
   renderSeminarPrompts();
   renderEnglishGroupPrompt();
   renderGrid(gridEl, getAllSelectedIds());
