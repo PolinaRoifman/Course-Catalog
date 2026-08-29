@@ -325,6 +325,14 @@ function renderEnglishGroupPrompt() {
     return;
   }
 
+  // Only one real option -- nothing to actually choose. Auto-select it.
+  if (buckets.length === 1) {
+    chosenEnglishGroup = buckets[0].key;
+    const instructor = buckets[0].sections[0]?.instructor || "TBA";
+    englishGroupPromptEl.innerHTML = `<p class="no-sections">Only one section available -- enrolled automatically (${instructor}).</p>`;
+    return;
+  }
+
   const box = document.createElement("div");
   box.className = "seminar-prompt";
 
@@ -529,6 +537,24 @@ function renderSeminarPrompts() {
   }
 
   withSeminars.forEach(({ course, seminars }) => {
+    const byGroup = {};
+    seminars.forEach(sec => {
+      const key = sec.group_number ?? "none";
+      if (!byGroup[key]) byGroup[key] = [];
+      byGroup[key].push(sec);
+    });
+
+    const groupKeys = Object.keys(byGroup);
+
+    // Only one real group -- nothing to actually choose. Auto-select it
+    // and don't show a prompt for this course at all.
+    if (groupKeys.length === 1) {
+      if (chosenSeminarByCourse[course.id] !== groupKeys[0]) {
+        chosenSeminarByCourse[course.id] = groupKeys[0];
+      }
+      return;
+    }
+
     const box = document.createElement("div");
     box.className = "seminar-prompt";
 
@@ -551,13 +577,6 @@ function renderSeminarPrompts() {
       warn.textContent = "Pick a seminar group:";
       box.appendChild(warn);
     }
-
-    const byGroup = {};
-    seminars.forEach(sec => {
-      const key = sec.group_number ?? "none";
-      if (!byGroup[key]) byGroup[key] = [];
-      byGroup[key].push(sec);
-    });
 
     Object.entries(byGroup)
       .sort((a, b) => Number(a[0]) - Number(b[0]))
@@ -583,6 +602,10 @@ function renderSeminarPrompts() {
 
     seminarPromptsEl.appendChild(box);
   });
+
+  if (seminarPromptsEl.innerHTML === "") {
+    seminarPromptsEl.innerHTML = `<p class="no-sections">No seminar choices needed right now -- single-group courses were enrolled automatically.</p>`;
+  }
 }
 
 // ---------- Electives ----------
