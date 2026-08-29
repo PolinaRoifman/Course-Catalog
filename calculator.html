@@ -127,6 +127,62 @@
     font-size: 0.85rem;
   }
 
+  #outsideCreditsForm {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.8rem;
+  }
+
+  #outsideCreditsForm select,
+  #outsideCreditsForm input {
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--rule);
+    background: var(--card);
+    color: var(--ink);
+    border-radius: 3px;
+  }
+
+  #outsideCreditsForm button {
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+    padding: 0.45rem 1rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  #outsideCreditsStatus {
+    font-size: 0.8rem;
+    color: var(--accent);
+  }
+
+  .outside-credit-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0.7rem;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--card);
+    font-size: 0.82rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .outside-credit-row button {
+    background: none;
+    border: none;
+    color: #7a2e2e;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.85rem;
+  }
+
   .check-title { flex: 1; }
 
   .check-toggle {
@@ -227,6 +283,15 @@
 
   <div id="wizard" style="display:none;">
     <div id="resultsArea"></div>
+
+    <h3>Add Outside Credits</h3>
+    <form id="outsideCreditsForm">
+      <select id="oc_category"></select>
+      <input type="number" id="oc_credits" value="6" min="1">
+      <button type="submit">Add</button>
+      <span id="outsideCreditsStatus"></span>
+    </form>
+    <div id="outsideCreditsList"></div>
 
     <h3>English</h3>
     <p class="progress-line" id="englishProgress"></p>
